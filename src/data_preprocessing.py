@@ -1,8 +1,11 @@
 import pandas as pd
 # import numpy as np
+import seaborn as sns
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from imblearn.over_sampling import SMOTE
+import matplotlib.pyplot as plt
+sns.set(style="whitegrid")  # or "darkgrid", "ticks", etc.
 # from datetime import datetime
 
 
@@ -10,6 +13,8 @@ def handle_missing_values(df):
     """Handle missing values by imputing or dropping."""
     # Check for missing values
     missing = df.isnull().sum()
+    print("Missing values per column:")
+    print(missing)
     if missing.sum() > 0:
         # Impute numerical columns with median
         numerical_cols = df.select_dtypes(include=['float64', 'int64']).columns
@@ -35,6 +40,8 @@ def clean_data(df):
         df['purchase_time'] = pd.to_datetime(df['purchase_time'])
     if 'ip_address' in df.columns:
         df['ip_address'] = df['ip_address'].astype(float)
+        print(df.info())
+        print(df.head())
     return df
 
 
@@ -48,12 +55,10 @@ def perform_eda(df):
                   f"Min={df[col].min()}, Max={df[col].max()}")
         else:
             print(f"{col}: {df[col].value_counts().to_dict()}")
-    
+    # 2. Distribution of numerical columns
     # Bivariate analysis (correlation for numerical features)
     print("\nCorrelation Matrix:")
-    numerical_cols = df.select_dtypes(include=['float64', 'int64']).columns
-    print(df[numerical_cols].corr())
-    
+    # Correlation for numerical features visualization    
     return df
 
 
@@ -73,6 +78,7 @@ def merge_datasets(fraud_df, ip_df):
     
     # Apply country mapping
     fraud_df['country'] = fraud_df['ip_address'].apply(lambda x: find_country(x, ip_df))
+    fraud_df.head()
     return fraud_df
 
 
@@ -80,7 +86,6 @@ def engineer_features(df):
     """Create transaction frequency, velocity, and time-based features."""
     # Transaction frequency by user_id
     df['transaction_count'] = df.groupby('user_id')['user_id'].transform('count')
-    
     # Transaction velocity (average time between transactions for each user)
     df['time_diff'] = df.groupby('user_id')['purchase_time'].diff().dt.total_seconds()
     df['avg_transaction_velocity'] = df.groupby('user_id')['time_diff'].transform('mean').fillna(0)
