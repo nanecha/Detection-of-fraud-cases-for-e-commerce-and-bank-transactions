@@ -128,23 +128,6 @@ profile = ProfileReport(Fraud_df, title="Automated EDA Report")
 profile.to_file("eda_report.html")
 ```
 
----
-
-## 6. Notes
-
-* Be cautious of memory errors for large encoded feature matrices.
-* Consider feature selection or dimensionality reduction for modeling.
-
----
-
-## 7. Next Steps
-
-* Model training and evaluation
-* Real-time fraud detection implementation
-* Model explainability (SHAP, LIME)
-
----
-
 ## Author
 
 Nanecha Kebede
@@ -158,3 +141,88 @@ Nanecha Kebede
 * `transformed_features.csv`
 * `target_labels.csv`
 * `eda_report.html`
+
+# 🧠 Task 2 – Model Building and Training
+
+## 🔧 Objective
+
+This task focuses on building and evaluating machine learning models to detect fraudulent e-commerce and bank transactions using preprocessed and engineered features obtained from Task 1.
+
+---
+
+## 📂 Step-by-Step Workflow
+
+### 1. ✨ Data Loading and Preparation
+
+* Load the previously processed data
+
+### 2. ⚙️ Data Preprocessing
+
+i Use Task 1 utilities to:
+
+* Handle missing values
+* Clean column formats and datatypes
+* Merge with IP geolocation data
+* Engineer time-based and frequency-based features
+
+### 3. 📈 Feature Transformation
+
+* Normalize/scale numerical features
+* Encode categorical variables
+* Address class imbalance using SMOTE or similar techniques
+
+```python
+X_transformed, y, preprocessor = transform_data(fraud_data, target_col='class', train=True)
+```
+
+Alternatively, use pre-saved files:
+
+```python
+processed_data = pd.read_csv('data/transformed_features.csv')
+processed_data['class'] = pd.read_csv('data/target_labels.csv')
+```
+
+---
+
+## 🤖 Model Training and Evaluation
+
+### 4. 🔧 Model Selection
+
+Train and evaluate multiple classifiers including:
+
+* Logistic Regression
+* Random Forest
+* Gradient Boosting
+* XGBoost / LightGBM
+
+The `main()` function in `src.model_training` handles model selection, training, and performance logging.
+
+```python
+models, results, best_model = main(processed_data)
+```
+
+### 5. ⚖️ Evaluation Metrics
+
+Each model is assessed using:
+
+* Accuracy
+* Precision, Recall, F1 Score
+* ROC-AUC
+* Confusion Matrix
+
+## 📊 Insights and Observations
+
+* **Imbalance Issue**: Fraud class is heavily underrepresented; handled through oversampling.
+* **Feature Importance**: Key contributors include:
+
+  * `purchase_value`, `hour_of_day`, `time_diff`, `day_of_week`
+  * Device/browser identifiers often correlated with fraud patterns.
+* **Best Performing Models**: Tree-based ensemble models generally outperformed simple linear classifiers in terms of F1 and ROC-AUC.
+
+---
+
+## 📅 Outputs
+
+* Trained models and performance results:
+
+*This task builds on the cleaned and engineered dataset from Task 1. It forms the foundation for future deployment and model interpretability work.*
