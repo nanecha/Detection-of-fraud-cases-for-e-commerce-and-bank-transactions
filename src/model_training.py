@@ -21,6 +21,7 @@ def prepare_data(df, target_col='class'):
     
     return X_train, X_test, y_train, y_test
 
+
 def train_models(X_train, y_train):
     """Train Logistic Regression and Random Forest models."""
     # Initialize models
@@ -32,6 +33,7 @@ def train_models(X_train, y_train):
     rf_model.fit(X_train, y_train)
     
     return lr_model, rf_model
+
 
 def evaluate_models(models, X_test, y_test):
     """Evaluate models using AUC-PR, F1-Score, and Confusion Matrix."""
@@ -61,9 +63,10 @@ def evaluate_models(models, X_test, y_test):
         plt.ylabel('True Label')
         plt.xlabel('Predicted Label')
         plt.savefig(f'confusion_matrix_{name.lower().replace(" ", "_")}.png')
-        plt.close()
+        plt.show()
     
     return results
+
 
 def compare_models(results):
     """Compare models and determine the best based on evaluation metrics."""
@@ -93,6 +96,7 @@ def compare_models(results):
     
     return best_model
 
+
 def main(fraud_data):
     """Main function to prepare data, train, and evaluate models."""
     # Prepare data
@@ -111,6 +115,7 @@ def main(fraud_data):
     best_model = compare_models(results)
     
     return models, results, best_model
+
 
 if __name__ == "__main__":
     # Example usage (assuming preprocessed data is available)
