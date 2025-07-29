@@ -1,0 +1,59 @@
+name: Fraud Detection CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas numpy scikit-learn imblearn matplotlib seaborn pytest flake8
+
+    - name: Create sample data for testing
+      run: |
+        echo "Creating sample fraud_data.csv"
+        cat << EOF > fraud_data.csv
+        user_id,signup_time,purchase_time,purchase_value,device_id,source,browser,sex,age,ip_address,class
+        22058,2015-02-24 22:55:49,2015-04-18 02:47:11,34,QVPSPJUOCKZAR,SEO,Chrome,M,39,732758368.79972,0
+        333320,2015-06-07 20:39:50,2015-06-08 01:38:54,16,EOGFQPIZPYXFZ,Ads,Chrome,F,53,350311387.86578,0
+        1359,2015-01-01 18:52:44,2015-01-01 18:52:45,15,YSSKYOSJHPPLJ,SEO,Opera,M,53,2621473820.0,1
+        EOF
+        echo "Creating sample ip_data.csv"
+        cat << EOF > ip_data.csv
+        lower_bound_ip_address,upper_bound_ip_address,country
+        16777216.0,16777471,Australia
+        16777472.0,16777727,China
+        16777728.0,16778239,China
+        EOF
+
+    - name: Run linting with flake8
+      run: |
+        flake8 data_processing.py model_training.py --max-line-length=100 --extend-ignore=E203
+
+    - name: Run tests
+      run: |
+        pytest test_scripts.py
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test-artifacts
+        path: |
+          *.png
+          *.log
