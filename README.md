@@ -128,9 +128,7 @@ profile = ProfileReport(Fraud_df, title="Automated EDA Report")
 profile.to_file("eda_report.html")
 ```
 
-## Author
 
-Nanecha Kebede
 
 ---
 
@@ -142,87 +140,117 @@ Nanecha Kebede
 * `target_labels.csv`
 * `eda_report.html`
 
-# 🧠 Task 2 – Model Building and Training
 
-## 🔧 Objective
+# Task 2 - Model Selection and Training
 
-This task focuses on building and evaluating machine learning models to detect fraudulent e-commerce and bank transactions using preprocessed and engineered features obtained from Task 1.
-
----
-
-## 📂 Step-by-Step Workflow
-
-### 1. ✨ Data Loading and Preparation
-
-* Load the previously processed data
-
-### 2. ⚙️ Data Preprocessing
-
-i Use Task 1 utilities to:
-
-* Handle missing values
-* Clean column formats and datatypes
-* Merge with IP geolocation data
-* Engineer time-based and frequency-based features
-
-### 3. 📈 Feature Transformation
-
-* Normalize/scale numerical features
-* Encode categorical variables
-* Address class imbalance using SMOTE or similar techniques
-
-```python
-X_transformed, y, preprocessor = transform_data(fraud_data, target_col='class', train=True)
-```
-
-Alternatively, use pre-saved files:
-
-```python
-processed_data = pd.read_csv('data/transformed_features.csv')
-processed_data['class'] = pd.read_csv('data/target_labels.csv')
-```
+This task focuses on selecting and training machine learning models to detect fraud using a previously preprocessed dataset. The objective is to evaluate different models and select the best-performing one based on evaluation metrics.
 
 ---
 
-## 🤖 Model Training and Evaluation
+## 🔄 Workflow
 
-### 4. 🔧 Model Selection
+1. **Data Loading and Preprocessing**
+   - csv files  are read into pandas DataFrames.
+   - Missing values are handled, and the data is cleaned.
+   - IP-related features are merged with fraud transaction data.
+   - Feature engineering is applied to generate meaningful features.
+   - The data is transformed using encoding and scaling techniques to prepare for training.
 
-Train and evaluate multiple classifiers including:
+2. **Dataset Preparation**
+   - Transformed features and corresponding labels are loaded from CSV files.
+   - The features and target are merged into a single dataset.
 
-* Logistic Regression
-* Random Forest
-* Gradient Boosting
-* XGBoost / LightGBM
+3. **Model Selection & Training**
+   - The script runs multiple models and evaluates them using metrics such as F1-score, precision, recall, and AUC.
+   - The best-performing model is selected based on these metrics.
 
-The `main()` function in `src.model_training` handles model selection, training, and performance logging.
 
-```python
-models, results, best_model = main(processed_data)
-```
+## 🚀 Output
 
-### 5. ⚖️ Evaluation Metrics
-
-Each model is assessed using:
-
-* Accuracy
-* Precision, Recall, F1 Score
-* ROC-AUC
-* Confusion Matrix
-
-## 📊 Insights and Observations
-
-* **Imbalance Issue**: Fraud class is heavily underrepresented; handled through oversampling.
-* **Feature Importance**: Key contributors include:
-
-  * `purchase_value`, `hour_of_day`, `time_diff`, `day_of_week`
-  * Device/browser identifiers often correlated with fraud patterns.
-* **Best Performing Models**: Tree-based ensemble models generally outperformed simple linear classifiers in terms of F1 and ROC-AUC.
+- Trained models and evaluation metrics.
+- `best_model`: The highest-performing model ready for deployment or further interpretation (e.g., SHAP analysis).
 
 ---
 
-## 📅 Outputs
+## 💡 Next Steps
 
-* Trained models and performance results:
+- Perform SHAP explainability analysis using the best model from this step.
 
-*This task builds on the cleaned and engineered dataset from Task 1. It forms the foundation for future deployment and model interpretability work.*
+
+# Task 3 - Model Explainability
+
+This task focuses on explaining the predictions of the best-performing fraud detection model using SHAP (SHapley Additive exPlanations). The objective is to interpret what features most influence model decisions and generate both summary and individual explanation plots.
+
+---
+
+## 🔍 Objective
+
+- Use SHAP to understand how features impact fraud prediction.
+- Visualize feature importance using SHAP summary plots.
+- Generate SHAP force plots to explain individual predictions.
+
+---
+
+## 📦 Imports and Modules
+
+- `shap`: For SHAP value calculation and visualization.
+- `matplotlib`, `seaborn`: For evaluation plots.
+- `scikit-learn`: For training models and calculating metrics.
+- `src.model_explain`: Contains reusable functions for preprocessing, training, evaluation, and SHAP visualization.
+
+---
+
+## 🧪 Process Overview
+
+1. **Load Preprocessed Data**
+   - Load `creditcard.csv`, `transformed_features.csv`, and `target_labels.csv`.
+
+2. **Data Preprocessing**
+   - Remove unnecessary columns like 'Time'.
+   - Split into training and testing sets for both credit card and fraud datasets.
+   - Scale features using `StandardScaler`.
+
+3. **Model Training**
+   - Train both Logistic Regression and Random Forest models.
+   - Evaluate models using F1-score, AUC-PR, confusion matrix, and classification report.
+
+4. **SHAP Analysis**
+   - Use `TreeExplainer` on the best model (Random Forest).
+   - Generate SHAP values for a sample of 100 rows.
+   - Create:
+     - **Summary Plot**: Displays global feature importance.
+     - **Force Plot**: Visualizes SHAP values for an individual prediction.
+   - Save the force plot as an HTML file (`force_plot.html`).
+
+---
+
+## 📁 Files Used
+
+- `creditcard.csv`: Raw credit card transaction data.
+- `transformed_features.csv`: Feature engineered fraud data.
+- `target_labels.csv`: Target labels for fraud classification.
+
+---
+
+## 📊 Outputs
+
+- Console output of evaluation metrics.
+- Precision-Recall and Confusion Matrix plots.
+- SHAP summary plot (bar plot of feature importance).
+- `force_plot.html`: Interactive SHAP force plot saved for individual prediction analysis.
+
+---
+
+## 🧠 Insight
+
+SHAP provides transparency into black-box models like Random Forest, which is crucial in financial fraud detection systems. Understanding which features drive predictions allows for better model validation and trust.
+
+---
+
+## ✅ Next Steps
+
+- Use these visual insights to guide future feature engineering and model improvement.
+- Optionally integrate SHAP explanations into a dashboard or reporting pipeline.
+
+
+
